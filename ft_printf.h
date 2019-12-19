@@ -32,6 +32,7 @@ typedef struct	s_printf
 	int		flagzero;
 	int		flagpoint;
 	int		flagstar;
+	int		base;
 }				t_printf;
 
 typedef struct	s_buff

@@ -13,7 +13,7 @@
 #include "ft_printf.h"
 va_copy,
 
-c, s, p, d, i, u, x, X, %
+ p, d, i, u, x, X, 
 
        Après  le  caractère  %,  les  éléments  suivant   doivent
        apparaître, dans l'ordre :
@@ -216,12 +216,28 @@ Un caractère « % » est écrit. Il n'y a pas de conversion. L'indicateur compl
 	return (buf);
 }*/
 
+	d && i : La précision, si elle est mentionnée, correspond au nombre minimal de chiffres qui doivent apparaître. Si la conversion fournit moins de chiffres, le résultat est rempli à gauche avec des zéros. Par défaut la précision vaut 1. Lorsque 0 est converti avec une précision valant 0, la sortie est vide.
+
+	o x X : Les lettres abcdef sont utilisées pour les conversions avec x, les lettres ABCDEF sont utilisées pour les conversions avec X. La précision, si elle est indiquée, donne un nombre minimal de chiffres à faire apparaître. Si la valeur convertie nécessite moins de chiffres, elle est complétée à gauche avec des zéros. La précision par défaut vaut 1. Lorsque 0 est converti avec une précision valant 0, la sortie est vide.
+
+
+
+int		whichbase(char c)
+{
+	int		base;
+
+	base = 0:
+	if (c == d || c == u ) //signed int decimal, unsigned int decimal et i ?
+		base = 10;
+	if (c == p || c == x || c == X) // unsigned long hexadecimal
+		base = 16;
+	if (c == o) // unsigned int octal
+		base = 8;
+	return (base);
+}
 
 int		conversionchar(char *str, va_list ap, t_buff mybuffer, t_printf format)
 {
-	int		count;
-
-	count = 0;
 	if (str[i] == 'c')
 /*S'il n'y a pas de modificateur l, l'argument entier, de type int, est converti en un unsigned char, et le caractère correspondant est affiché. Si un modificateur l est présent, l'argument de type wint_t (caractère large) est converti en séquence multi-octet par un appel à wcrtomb(3), avec un état de conversion débutant dans l'état initial. La chaîne multi-octet résultante est écrite.*/
 	{
@@ -234,9 +250,12 @@ int		conversionchar(char *str, va_list ap, t_buff mybuffer, t_printf format)
 		memnoncpy(mybuffer.buff, va_arg(ap, char *);
 		mybuffer.j = ft_strlen(mybuffer.buff);
 	}
-	else if (str[i] == 'p')
-
-
+	else if (str[i] == '%')
+	{
+		mybuffer.buff[mybuffer.j] = '%';
+		mybuffer.j += 1;
+	}
+	return (mybuffer.j);
 }
 
 int		direction(char *str, va_list ap, t_buff mybuffer, t_printf format)
@@ -244,11 +263,12 @@ int		direction(char *str, va_list ap, t_buff mybuffer, t_printf format)
 	int		count;
 
 	count = 0;
-	if (ischar(str[i], "0123456789" == 1)
+	if (is_char(str[i], "0123456789" == 1)
 //		?????????
-	if (is char(str[i], "csp%" == 1)
+	if (is_char(str[i], "cs%" == 1)
 		count = conversionchar(str, ap, mybuffer, format);
-	if (is char(str[i], "diuxX" == 1)
+	if (is_char(str[i], "diuxXp" == 1)
+		whichbase(str[i], ap);
 		count = conversionint(str, ap, mybuffer, format);
 
 	return (count);
