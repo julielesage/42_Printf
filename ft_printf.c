@@ -6,14 +6,16 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/12 22:40:44 by jlesage           #+#    #+#             */
-/*   Updated: 2019/12/19 15:26:43 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/01/01 23:38:17 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "ft_printf.h"
 va_copy,
+% [flags][width][.precision][size]type
 
- p, d, i, u, x, X, 
+c, s, p, d, i, u, x, X, %
+https://docs.microsoft.com/fr-fr/cpp/c-runtime-library/format-specification-syntax-printf-and-wprintf-functions?view=vs-2019
 
        Après  le  caractère  %,  les  éléments  suivant   doivent
        apparaître, dans l'ordre :
@@ -29,8 +31,6 @@ Vous devez gérer n’importe quelle combinaison de flags ’-0.*’ et la taill
                      qu'avec des espaces.  Si une  précision  est
                      fournie avec une conversion numérique (d, i,
                      o, u, i, x, et X), l'attribut 0 est  ignoré.
-		0 uniquement avec c, s, p et % ? 
-		conversion numerique d, i, o, u, i x, X a faie a part car . precision decimale
 
               -      (un attribut de largeur négatif) indique que
                      la valeur doit être justifiée sur la  limite
@@ -116,10 +116,7 @@ Vous devez gérer n’importe quelle combinaison de flags ’-0.*’ et la taill
 VALEUR RENVOYÉE
 Si elles réussissent, ces fonctions renvoient le nombre de caractères imprimés, sans compter l'octet nul « \0 » final dans les chaînes. 
 
-Chaîne de format
-Le format de conversion est indiqué par une chaîne de caractères, commençant et se terminant dans son état de décalage initial. La chaîne de format est composée d'indicateurs : les caractères ordinaires (différents de %), qui sont copiés sans modification sur la sortie, et les spécifications de conversion, qui sont mises en correspondance avec les arguments suivants. Les spécifications de conversion sont introduites par le caractère %, et se terminent par un indicateur de conversion. Entre eux peuvent se trouver (dans l'ordre), zéro ou plusieurs attributs, une valeur optionnelle de largeur minimal de champ, une valeur optionnelle de précision, et un éventuel modificateur de longueur.
-Les arguments doivent correspondre correctement (après les promotions de types) avec les indicateurs de conversion. Par défaut les arguments sont pris dans l'ordre indiqué, où chaque « * » et chaque indicateur de conversion réclament un nouvel argument (et où l'insuffisance en arguments est une erreur). On peut aussi préciser explicitement quel argument prendre, en écrivant, à chaque conversion, « %m$ » au lieu de « % », et « *m$ » au lieu de « * ». L'entier décimal m indique la position dans la liste d'arguments, l'indexation commençant à 1. Ainsi,
-
+ Par défaut les arguments sont pris dans l'ordre indiqué, où chaque « * » et chaque indicateur de conversion réclament un nouvel argument (et où l'insuffisance en arguments est une erreur). 
 
 printf("%*d", width, num);
 
@@ -135,10 +132,6 @@ printf("%aq.2f", 1234567.89);
 
 s'affichera comme « 1234567.89 » dans la localisation POSIX, « 1 234 567,89 » en localisation fr_FR, et « 1.234.567,89 » en localisation da_DK.  
 
-Caractère d'attribut
-Le caractère % peut être éventuellement suivi par un ou plusieurs attributs suivants :
-#
-indique que la valeur doit être convertie en une autre forme. Pour la conversion o le premier caractère de la chaîne de sortie vaudra zéro (en ajoutant un préfixe 0 si ce n'est pas déjà un zéro). Pour les conversions x et X une valeur non nulle reçoit le préfixe « 0x » (ou « 0X » pour l'indicateur X). Pour les conversions a, A, e, E, f, F, g, et G le résultat contiendra toujours un point décimal même si aucun chiffre ne le suit (normalement, un point décimal n'est présent avec ces conversions que si des décimales le suivent). Pour les conversions g et G les zéros en tête ne sont pas éliminés, contrairement au comportement habituel. Pour les autres conversions, cet attribut n'a pas d'effet.
 0
 indique le remplissage avec des zéros. Pour les conversions d, i, o, u, x, X, a, A, e, E, f, F, g, et G, la valeur est complétée à gauche avec des zéros plutôt qu'avec des espaces. Si les attributs 0 et - apparaissent ensemble, l'attribut 0 est ignoré. Si une précision est fournie avec une conversion numérique (d, i, o, u, x, et X), l'attribut 0 est ignoré. Pour les autres conversions, le comportement est indéfini.
 -
@@ -197,6 +190,55 @@ m
 %
 Un caractère « % » est écrit. Il n'y a pas de conversion. L'indicateur complet est « %% ».
 
+/*void		bflush(t_buff *b, const char *str, int n)
+{
+	int		i;
+
+	i = 0;
+	if (b->err == 1)
+		return ;
+	while ((b->pos + n) > BUFF_SIZE)
+	{
+		i = (BUFF_SIZE - b->pos);
+		ft_memcpyp((b->buff) + b->pos, str, i);
+		write(b->fd, &(b->buff), b->pos + i);
+		ft_bzerop(b->buff, BUFF_SIZE + 1);
+		b->pos = 0;
+		b->len += i;
+		str += i;
+		n -= i;
+	}
+	ft_memcpyp((b->buff) + b->pos, str, n);
+	b->len += n;
+	b->pos += n;
+}
+
+void		ft_readf(const char *fmt, t_buff *b, va_list args)
+{
+	t_printf	t;
+	int			idx;
+	int			i;
+
+	i = -1;
+	idx = 0;
+	while (fmt[++i])
+	{
+		if (fmt[i] == '%' && b->err == 0)
+		{
+			bflush(b, fmt, i);
+			b->err_len = i;
+			fmt += i + 1;
+			idx = ft_xtractor(&t, fmt, args);
+			if (!fmt[idx])
+				break ;
+			ft_handler(b, &t, args);
+			fmt += idx + 1;
+			i = -1;
+		}
+	}
+	bflush(b, fmt, i);
+}*/
+
 /*char *fullbuffer(char *buf, char *result, BUFFER_SIZE)
 {	
 	int i;
@@ -215,13 +257,6 @@ Un caractère « % » est écrit. Il n'y a pas de conversion. L'indicateur compl
 	}
 	return (buf);
 }*/
-
-	d && i : La précision, si elle est mentionnée, correspond au nombre minimal de chiffres qui doivent apparaître. Si la conversion fournit moins de chiffres, le résultat est rempli à gauche avec des zéros. Par défaut la précision vaut 1. Lorsque 0 est converti avec une précision valant 0, la sortie est vide.
-
-	o x X : Les lettres abcdef sont utilisées pour les conversions avec x, les lettres ABCDEF sont utilisées pour les conversions avec X. La précision, si elle est indiquée, donne un nombre minimal de chiffres à faire apparaître. Si la valeur convertie nécessite moins de chiffres, elle est complétée à gauche avec des zéros. La précision par défaut vaut 1. Lorsque 0 est converti avec une précision valant 0, la sortie est vide.
-
-
-
 int		whichbase(char c)
 {
 	int		base;
@@ -256,6 +291,30 @@ int		conversionchar(char *str, va_list ap, t_buff mybuffer, t_printf format)
 		mybuffer.j += 1;
 	}
 	return (mybuffer.j);
+}// last version
+
+int		conversionchar(char *str, va_list ap, t_buff mybuffer, t_printf format)
+{
+	int		count;
+
+	count = 0;
+	if (format.flagzero == 1)
+		
+	if (str[i] == 'c')
+/*S'il n'y a pas de modificateur l, l'argument entier, de type int, est converti en un unsigned char, et le caractère correspondant est affiché. Si un modificateur l est présent, l'argument de type wint_t (caractère large) est converti en séquence multi-octet par un appel à wcrtomb(3), avec un état de conversion débutant dans l'état initial. La chaîne multi-octet résultante est écrite.*/
+	{
+		mybuffer.buff[mybuffer.j] = va_arg(ap, char);
+		mybuffer.j += 1;
+		return (1);
+	}
+	else if (str[i] == 's')
+	{
+		memnoncpy(mybuffer.buff, va_arg(ap, char *);
+		mybuffer.j = ft_strlen(mybuffer.buff);
+	}
+	else if (str[i] == 'p')
+
+
 }
 
 int		direction(char *str, va_list ap, t_buff mybuffer, t_printf format)
@@ -263,15 +322,11 @@ int		direction(char *str, va_list ap, t_buff mybuffer, t_printf format)
 	int		count;
 
 	count = 0;
-	if (is_char(str[i], "0123456789" == 1)
-//		?????????
-	if (is_char(str[i], "cs%" == 1)
+	if (is char(str[i], "csp%" == 1)
 		count = conversionchar(str, ap, mybuffer, format);
-	if (is_char(str[i], "diuxXp" == 1)
-		whichbase(str[i], ap);
+	if (is char(str[i], "diuxX" == 1)
 		count = conversionint(str, ap, mybuffer, format);
-
-	return (count);
+	return (count);//nombre caracteres ecrits dans buffer.j
 }
 
 int		checkflags(char *str, va_list ap, t_buff mybuffer, t_printf format)
@@ -279,11 +334,11 @@ int		checkflags(char *str, va_list ap, t_buff mybuffer, t_printf format)
 	int i;
 	int	count;
 
-	i = 0;
-	count = 0;
+	i = -1;
+	count = -1;
 	if (!str)
-		return (-1);
-	while (ischar(str[i], "-0.*" == 1)
+		mybuffer.error = 1;
+	while (ischar(str[i++], "-0.*") == 1 || ischar(str[i], "0123456789" == 1))
 	{
 		if (str[i] == '-')
 			format.flagminus = 1;
@@ -293,10 +348,10 @@ int		checkflags(char *str, va_list ap, t_buff mybuffer, t_printf format)
 			format.flagpoint = 1;
 		if (str[i] == '*')
 			format.flagstar = 1;
-		i++;
+		format.flaglen++;
 	}
 	count = direction(&str[i], ap, mybuffer, format);
-	return (count);
+	return (count);//nombre caracteres ecrits dans buffer.j
 }
 
 int		readstring(const char *str, t_buff mybuffer, va_list ap)
@@ -307,13 +362,17 @@ int		readstring(const char *str, t_buff mybuffer, va_list ap)
 
 	i = -1;
 	count = 0;
-	mybuffer.j = -1;
 	while (str[i++] != '\0' && mybuffer.error == 0)
 	{
 		if (str[i] = '%' && str[i+1])
 		{
 			ft_bzero(format, sizeof(t_printf));
+	//si mybuffer.j + i > BUFFER_SIZE
+	//write(1, &(mybuffer.buff), mybuffer.len);
+	//ft_bzero(mybuffer, sizeof(t_buff));
+
 			count = checkflags(&str[i+1], ap, mybuffer, format);
+			i = i + format.flaglen
 			mybuffer.j += count;
 		}
 		else
@@ -322,8 +381,8 @@ int		readstring(const char *str, t_buff mybuffer, va_list ap)
 			mybuffer.j++;
 		}
 	}
-	mybuffer.buff[format.j + 1] = '\0';
-	return (mybuffer.j + 1);
+	mybuffer.buff[format.j] = '\0';
+	return (mybuffer.j);
 }
 
 int		ft_printf(const char *str, ...)
@@ -338,6 +397,8 @@ int		ft_printf(const char *str, ...)
 		return (-1);
 	ft_bzero(mybuffer, sizeof(t_buff));
 	count = readstring(str, mybuffer, ap);
+	if (mybuffer.error == 1)
+		return (-1);
 	write(1, &(mybuffer.buff), mybuffer.len);
 	va_end(ap);
 	return (count);

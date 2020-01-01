@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/12 22:36:10 by jlesage           #+#    #+#             */
-/*   Updated: 2019/12/19 15:26:35 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/01/01 23:38:22 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -32,7 +32,7 @@ typedef struct	s_printf
 	int		flagzero;
 	int		flagpoint;
 	int		flagstar;
-	int		base;
+	int		flaglen;
 }				t_printf;
 
 typedef struct	s_buff
@@ -40,7 +40,7 @@ typedef struct	s_buff
 	char	buff[BUFFER_SIZE + 1];
 //	char	*str;
 	int		error;
-//	int		len;
+	int		len;
 	int		j;
 }				t_buff;
 
