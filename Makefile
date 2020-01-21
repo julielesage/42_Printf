@@ -6,7 +6,7 @@
 #    By: jlesage <marvin@42.fr>                     +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2020/01/11 16:03:42 by jlesage           #+#    #+#              #
-#    Updated: 2020/01/12 20:02:59 by jlesage          ###   ########.fr        #
+#    Updated: 2020/01/21 15:40:18 by jlesage          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
@@ -26,6 +26,7 @@ OBJLIB_PATH = objs
 
 SRCS_NAMES =  ft_printf.c\
 				conversion1.c\
+				field.c\
 
 LIBFT_NAMES = ft_putstr_fd.c\
 				ft_bzero.c\
@@ -34,6 +35,11 @@ LIBFT_NAMES = ft_putstr_fd.c\
 				ft_putnbr_fd.c\
 				ft_strncmp.c\
 				ft_itoa_base.c\
+				ft_substr.c\
+				ft_strcat.c\
+				ft_strdup.c\
+				ft_atoi.c\
+				ft_strndup.c\
 
 INCLUDE_NAME = ft_printf.h
 OBJS_NAME = $(SRCS_NAMES:.c=.o)
