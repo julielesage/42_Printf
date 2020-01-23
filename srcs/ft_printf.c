@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:42:44 by jlesage           #+#    #+#             */
-/*   Updated: 2020/01/21 21:30:08 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/01/23 23:23:15 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -68,20 +68,25 @@ void	checkflags(const char *str, va_list ap, t_result *r, t_format *f)
 	count = -1;
 	if (!str)
 		r->error = 1;
-	while (ischar(str[i++], "-0.*") == 1 || ischar(str[i], "0123456789") == 1)
+	if (ischar(str[i++], "-0.*") == 1 || ischar(str[i], "0123456789") == 1)
 	{
-		if (str[i] == '-')
-			f->flagminus = 1;
-		if (str[i] == '0')
-			f->flagzero = 1;
-		if (str[i] == '.')
-			f->flagpoint = 1;
-		if (str[i] == '*')
-			f->flagstar = 1;
-		f->flaglen++;
+		while (ischar(str[i++], "-0.*") == 1 || ischar(str[i], "0123456789") == 1)
+		{
+			if (str[i] == '-')
+				f->flagminus = 1;
+			if (str[i] == '0')
+				f->flagzero = 1;
+			if (str[i] == '.')
+				f->flagpoint = 1;
+			if (str[i] == '*')
+				f->flagstar = 1;
+			f->flaglen++;
+		}
+		i -= 1;
 	}
 	if (f->flagzero == 1 && (f->flagminus == 1 || f->flagpoint == 1))
 		f->flagzero = 0;
+	//printf("&str[i] : %s\n", &str[i]);
 	direction(&str[i], ap, r, f);
 }
 
