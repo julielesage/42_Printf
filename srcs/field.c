@@ -6,35 +6,38 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/17 22:39:57 by jlesage           #+#    #+#             */
-/*   Updated: 2020/01/23 23:25:58 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/01/27 18:06:09 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ft_printf.h"
 #include <stdio.h>
 
-char	*ft_strdupiplus(char *result, t_format *f, size_t len)
+char	*ft_strdupiplus(char *result, t_format *f, int len)
 {
-	size_t		i;
+	int		i;
 	char	*copy;
 
-	i = 0;
-	copy = (char *)malloc(sizeof(char) * len + 1);
+	i = (int)ft_strlen(result) - 1; //0
+	copy = (char *)malloc(sizeof(char) * len + 1);//3
 	if (copy == NULL)
 		return (NULL);
-	while (result[i])
+	//printf(" i = %d et len = %d\n", i, len);
+	copy[len] = '\0';
+	while (i > -1)
 	{
-		copy[i] = result[i];
-		i++;
+		copy[len - 1] = result[i];
+		len--;
+		i--;
+		//printf(" i = %d et len = %d\n", i, len);
 	}
-	i -= 1;
-	while (i++ < len)
+	while (len-- >= 0)
 	{
 		if (f->flagzero == 1)
-			copy[i] = '0';
-		else copy[i] = ' ';
+			copy[len] = '0';
+		else copy[len] = ' ';
+		//printf(" i = %d et len = %d\n", i, len);
 	}
-	copy[i] = '\0';
 	free (result);
 	return (copy);
 }
@@ -73,6 +76,7 @@ char	*strchiffres(const char *str, int len)
 		i++;
 	}
 	precision[i] = '\0';
+	//printf("precision : %s\n", precision);
 	return (precision);
 }
 

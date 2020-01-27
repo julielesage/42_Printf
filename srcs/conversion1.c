@@ -6,14 +6,14 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:34:31 by jlesage           #+#    #+#             */
-/*   Updated: 2020/01/23 23:25:50 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/01/27 18:05:43 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ft_printf.h"
 #include <stdio.h>
 
-char		*handling_field(char *result, t_format *f, size_t len)
+char		*handling_field(char *result, t_format *f, size_t width)
 {
 	char *str;
 	int i;
@@ -21,12 +21,13 @@ char		*handling_field(char *result, t_format *f, size_t len)
 //	result = //precisefunction
 	i = 0;
 	str = NULL;
-	if (len > strlen(result))
+	if (width > strlen(result))
 	{
 		if (f->flagminus == 1)
-			str = ft_strdupiminus(result, len);
+			str = ft_strdupiminus(result, width);
 		else 
-			str = ft_strdupiplus(result, f, len);
+			str = ft_strdupiplus(result, f, width);
+		//printf("str : %s\n", str);
 		return (str);
 	}
 	else return (result);
@@ -36,7 +37,7 @@ char		*widthprecision(char *result, t_format *f)
 {
 	char	*new_str;
 	char	*width;
-	size_t		i;
+	int		i;
 
 	new_str = NULL;
 	width = NULL;
@@ -45,9 +46,10 @@ char		*widthprecision(char *result, t_format *f)
 	{
 		while (ischar(f->precisi[i], "0123456789") == 1)
 			i++;
-		width = ft_strndup(f->precisi, i);
+		width = ft_strndup(f->precisi, i);//malloc de width
 	}
 	i = ft_atoi(width);
+	//printf("width : %zu\n", i);// 1
 	new_str = handling_field(result, f, i);//faire un malloc pour newstr du nombre i + 1
 	//modifier le field avec 0 - . et * 
 	return (new_str);
@@ -95,11 +97,11 @@ void		conversion_digit(const char *str, va_list ap, t_result *r,
 		result = ft_itoa_base(va_arg(ap, int), f);
 	if (*str == 'p')
 		result = modify_pointer(result);
-	//result = widthprecision(result, f);
+	result = widthprecision(result, f);
 	ft_putstr_fd(result, 1);
 	f->flaglen += 1;
 	r->lentotal += ft_strlen(result);
-	printf("lentotal : %d\n", r->lentotal);
+	//printf("lentotal : %d\n", r->lentotal);
 	free (result);
 }
 

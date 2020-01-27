@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:42:44 by jlesage           #+#    #+#             */
-/*   Updated: 2020/01/23 23:23:15 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/01/27 18:05:06 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -43,7 +43,11 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 	int		i;
 
 	i = 0;
+	while (ischar(str[i], "cspdiouxX%") == 0)
+		i++;
 	f->precisi = strchiffres(str, i);
+	f->flaglen += i;
+	//printf("flaglen direction: %d\n", f->flaglen);
 	if (ischar(str[i], "cs") == 1)
 		conversionchar(str, ap, r, f);
 	else if (ischar(str[i], "pdiouxX") == 1)
@@ -87,6 +91,7 @@ void	checkflags(const char *str, va_list ap, t_result *r, t_format *f)
 	if (f->flagzero == 1 && (f->flagminus == 1 || f->flagpoint == 1))
 		f->flagzero = 0;
 	//printf("&str[i] : %s\n", &str[i]);
+	//printf("flaglen : %d\n", f->flaglen);
 	direction(&str[i], ap, r, f);
 }
 
