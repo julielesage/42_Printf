@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/12 22:36:10 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/01 15:59:28 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/02 00:38:33 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -29,6 +29,7 @@ typedef struct	s_format
 	char	*basestr;
 	long	basenb;
 	int		width;
+	int		ifwidth;
 	int		precision;
 	char	flag;
 
@@ -67,10 +68,12 @@ void		conversion_digit(const char *str, va_list ap, t_result *r, t_format *);
 char		*widthprecision(char *result, t_format *f);
 char		*handling_field(char *result, t_format *f);
 char		*ft_strdupiplus(char *result, t_format *f);
-char		*ft_strdupiminus(char *result, size_t len);
+char		*ft_strdupiminus(char *result, int len);
 int			strchiffres(const char *sr, int len);
 char		*withpoint(char *result, t_format *f);
 char		*s_withpoint(char *result, t_format *f);
 char		*large_precision(char *result, t_format *f);
+char		*large_precision_minus(char *result, int buf);
+
 
 #endif
