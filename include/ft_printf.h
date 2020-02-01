@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/12 22:36:10 by jlesage           #+#    #+#             */
-/*   Updated: 2020/01/23 23:25:13 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/01 15:59:28 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,10 +26,12 @@ typedef struct	s_format
 	int		flagzero;
 	int		flagpoint;
 	int		flagstar;
-	int		flaglen;
 	char	*basestr;
 	long	basenb;
-	char	*precisi;
+	int		width;
+	int		precision;
+	char	flag;
+
 }				t_format;
 
 typedef struct	s_result
@@ -52,20 +54,23 @@ char		*ft_substr(char *s, unsigned int start, size_t len);
 char		*ft_strcat(char *dst, char *src);
 char		*ft_strdup(const char *s1);
 int			ft_atoi(char *str);
-char		*ft_strndup(char *str, size_t n);
+void		*ft_memchr(void *str, int c);
+char		*ft_strndup(char *str, int n);
 
 int			ft_printf(const char *str, ...);
 void		readstring(const char *str, t_result *r, va_list ap);
 void		checkflags(const char *str, va_list ap, t_result *r, t_format *f);
 void		direction(const char *str, va_list ap, t_result *r, t_format *f);
-void		conversionchar(const char *str, va_list ap, t_result *r,
-				t_format *f);
+void		conversionchar(const char *str, va_list ap, t_result *r, t_format *f);
 void		witchbase(char c, t_format *f);
 void		conversion_digit(const char *str, va_list ap, t_result *r, t_format *);
 char		*widthprecision(char *result, t_format *f);
-char		*handling_field(char *result, t_format *f, size_t len);
-char		*ft_strdupiplus(char *result, t_format *f, size_t len);
+char		*handling_field(char *result, t_format *f);
+char		*ft_strdupiplus(char *result, t_format *f);
 char		*ft_strdupiminus(char *result, size_t len);
-char		*strchiffres(const char *sr, int len);
+int			strchiffres(const char *sr, int len);
+char		*withpoint(char *result, t_format *f);
+char		*s_withpoint(char *result, t_format *f);
+char		*large_precision(char *result, t_format *f);
 
 #endif

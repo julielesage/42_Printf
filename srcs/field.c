@@ -6,25 +6,62 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/17 22:39:57 by jlesage           #+#    #+#             */
-/*   Updated: 2020/01/27 18:06:09 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/01 17:48:10 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ft_printf.h"
 #include <stdio.h>
 
-char	*ft_strdupiplus(char *result, t_format *f, int len)
+char *s_withpoint(char *result, t_format *f)
+{
+	char	*hopprecis;
+
+	hopprecis = NULL;
+	//printf("precision = %d\n", f->precision);
+	//printf("result = %s\n", result);
+	if (f->precision < 1  && (result[0] == '0' && result[1] == '\0'))
+		return (hopprecis);
+	else if (f->precision < 1 && f->flagpoint == 1)
+		return (result);
+	else
+		hopprecis = strndup(result, f->precision);
+	free (result);
+	return (hopprecis);
+}
+
+char *withpoint(char *result, t_format *f)
+{
+	char	*hopprecis;
+
+	hopprecis = NULL;
+	//printf("precision = %d\n", f->precision);
+	//printf("result = %s\n", result);
+	if (f->precision < 1  && (result[0] == '0' && result[1] == '\0'))
+		return (hopprecis);
+	else if ((f->precision < 1 && f->flagpoint == 1)
+				|| (f->precision < (int)ft_strlen(result)))
+		return (result);
+	else
+		hopprecis = large_precision(result, f);
+	free (result);
+	return (hopprecis);
+}
+
+char	*ft_strdupiplus(char *result, t_format *f)
 {
 	int		i;
 	char	*copy;
+	int		len;
 
 	i = (int)ft_strlen(result) - 1; //0
+	len = f->width;
 	copy = (char *)malloc(sizeof(char) * len + 1);//3
 	if (copy == NULL)
 		return (NULL);
 	//printf(" i = %d et len = %d\n", i, len);
 	copy[len] = '\0';
-	while (i > -1)
+	while (result && i > -1)
 	{
 		copy[len - 1] = result[i];
 		len--;
@@ -45,8 +82,8 @@ char	*ft_strdupiplus(char *result, t_format *f, int len)
 char	*ft_strdupiminus(char *result, size_t len)
 {
 	size_t		i;
-	char	*copy;
-	int		j;
+	char		*copy;
+	int			j;
 
 	i = 0;
 	j = strlen(result);//5
@@ -59,25 +96,32 @@ char	*ft_strdupiminus(char *result, size_t len)
 	while (len-- && len > 0)
 		copy[len] = ' ';
 	free (result);
+	//printf("free result de l itoa\n");
 	return (copy);
 }
 
-char	*strchiffres(const char *str, int len)
+int		strchiffres(const char *str, int len)
 {
-	char	*precision;
+	char	*width;
 	int		i;
+	int		result;
 
 	i = 0;
-	if (!(precision = (char *)malloc(sizeof (char) * len + 1)))
-		return NULL;
+	result = 0;
+	if (!(width = (char *)malloc(sizeof (char) * len + 1)))
+		return (0);
+	//printf("malloc width en str\n");
 	while (ischar(str[i], "cspdiouxX%") == 0)
 	{
-		precision[i] = str[i];
+		width[i] = str[i];
 		i++;
 	}
-	precision[i] = '\0';
-	//printf("precision : %s\n", precision);
-	return (precision);
+	width[i] = '\0';
+	//printf("width : %s\n", width);
+	result = ft_atoi(width);
+	free (width);
+	//printf("free widthstr\n");
+	return (result);
 }
 
 /*Si la spécification de la largeur est un astérisque (*), un argument int issu de la liste d’arguments fournit la valeur. L’argument width doit précéder la valeur mise en forme dans la liste des arguments, comme illustré dans l’exemple suivant :

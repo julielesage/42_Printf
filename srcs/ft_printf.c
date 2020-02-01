@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:42:44 by jlesage           #+#    #+#             */
-/*   Updated: 2020/01/27 18:05:06 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/01 15:42:29 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,15 +24,17 @@ void	conversionchar(const char *str, va_list ap, t_result *r, t_format *f)
 	{
 		c = (char)(va_arg(ap, int));
 		write(1, &c, 1);
-		f->flaglen += 1;
 		r->lentotal++;
 	}
 	else if (str[0] == 's')
 	{
 		s = va_arg(ap, char *);
 		r->lentotal += ft_strlen(s);
+		if (f->width > -1)
+			s = handling_field(s, f);
+		if (f->precision > -1)
+			s = s_withpoint(s, f);
 		ft_putstr_fd(s, 1);
-		f->flaglen += 1;
 	}
 	else
 		r->error = 1;
@@ -41,19 +43,52 @@ void	conversionchar(const char *str, va_list ap, t_result *r, t_format *f)
 void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 {
 	int		i;
+	int		j;
+	int		k;
 
 	i = 0;
-	while (ischar(str[i], "cspdiouxX%") == 0)
+	j = 0;
+	k = 0;
+	while (ischar(str[i], ".cspdiouxX%") == 0)
 		i++;
-	f->precisi = strchiffres(str, i);
-	f->flaglen += i;
-	//printf("flaglen direction: %d\n", f->flaglen);
+	if (i > 0)
+	{
+		f->width = strchiffres(str, i);
+		//printf("f->width = %d\n", f->width);
+	}
+	//printf("str : %s et i = %d\n", str, i);
+
+	if (str[i] == '.')
+	{
+		i++;
+		if (str[i] == '*') 
+			f->precision = -3;// c est chaud
+		else if (ischar(str[i], "0123456789") == 0)
+			f->precision = -1;
+		else
+		{
+			while (ischar(str[i], "0123456789") == 1)
+			{
+				i++;
+				j++;
+			}
+			k = i - j;
+			f->precision = strchiffres(&str[k], j);
+		}
+	}
+	if (f->precision > -1)
+		f->width = -1;
+	//printf("f->precision = %d\n, i = %d et str : %s\n", f->precision, i, str);
 	if (ischar(str[i], "cs") == 1)
+	{
 		conversionchar(str, ap, r, f);
+		f->flag = str[i];
+	}
 	else if (ischar(str[i], "pdiouxX") == 1)
 	{
+		f->flag = str[i];
 		witchbase(str[i], f);
-		conversion_digit(str, ap, r, f);
+		conversion_digit(&str[i], ap, r, f);
 	}
 	else if (str[i] == '%')
 		write(1, "%", 1);
@@ -61,53 +96,63 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 		r->error = 1;
 }
 
-//si on envoie une struct avec &
-//alors les modification  ne sont plus des points mais des -> va savoir pourquoi
 void	checkflags(const char *str, va_list ap, t_result *r, t_format *f)
 {
 	int	i;
-	int	count;
+	int	j;
 
-	i = -1;
-	count = -1;
+	i = 0;
+	j = 0;
 	if (!str)
 		r->error = 1;
-	if (ischar(str[i++], "-0.*") == 1 || ischar(str[i], "0123456789") == 1)
+	while (ischar(str[i], "pdcsiouxX%") == 0)
 	{
-		while (ischar(str[i++], "-0.*") == 1 || ischar(str[i], "0123456789") == 1)
+		if (str[i] == '.')
+			f->flagpoint = 1;
+		i++;
+	}
+	//printf("flagpoint : %d\n", f->flagpoint);
+	i = 0;
+	if (ischar(str[i], "-0*") == 1)
+	{
+		while (ischar(str[i], "-0*") == 1)
 		{
 			if (str[i] == '-')
 				f->flagminus = 1;
-			if (str[i] == '0')
+			else if (str[i] == '0')
 				f->flagzero = 1;
-			if (str[i] == '.')
-				f->flagpoint = 1;
-			if (str[i] == '*')
+			else if (str[i] == '*')
 				f->flagstar = 1;
-			f->flaglen++;
+			i++;
 		}
-		i -= 1;
+	//	i--;
 	}
 	if (f->flagzero == 1 && (f->flagminus == 1 || f->flagpoint == 1))
 		f->flagzero = 0;
 	//printf("&str[i] : %s\n", &str[i]);
-	//printf("flaglen : %d\n", f->flaglen);
 	direction(&str[i], ap, r, f);
 }
+
 
 void	readstring(const char *str, t_result *r, va_list ap)
 {
 	t_format	f;
 	int			i;
+	int			j;
 
 	i = 0;
-	while (str[i] && r->error == 0)
+	while (str[i] != '\0' && r->error == 0)
 	{
 		if (str[i] == '%' && str[i + 1])
 		{
+			j = 1;
 			ft_bzero(&f, sizeof(t_format));
+			f.width = -1;
+			f.precision = -1;
+			while (ischar(str[i + j], "cspdiouxX%") == 0)
+				j++;
 			checkflags(&str[i + 1], ap, r, &f);
-			i = i + f.flaglen;
+			i = i + j;
 		}
 		else
 		{
@@ -115,6 +160,7 @@ void	readstring(const char *str, t_result *r, va_list ap)
 			r->lentotal++;
 		}
 		i++;
+		//printf("i = %d et j = %d\n", i, j);
 	}
 }
 
@@ -131,6 +177,5 @@ int		ft_printf(const char *str, ...)
 	if (r.error == 1)
 		return (-1);
 	va_end(ap);
-	printf("return lentotal : %d\n", r.lentotal);
 	return (r.lentotal);
 }
