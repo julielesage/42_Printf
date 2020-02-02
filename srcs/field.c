@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/17 22:39:57 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/02 18:05:36 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/02 23:27:37 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -80,7 +80,9 @@ char	*ft_strdupiplus(char *result, t_format *f)
 		else
 			copy[len] = ' ';
 	}
-	free (result);
+	//printf("flag = %c\n", f->flag);
+	if (f->flag != 's')
+		free (result);
 	return (copy);
 }
 

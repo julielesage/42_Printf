@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:42:44 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/02 18:04:57 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/02 23:34:18 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -19,6 +19,9 @@ void	conversionchar(const char *str, va_list ap, t_result *r, t_format *f)
 	char	*s;
 
 
+	//printf("str: %s\n", str);
+	//printf("flag : %c\n", f->flag);
+
 	if (str[0] == 'c')
 	{
 		c = (char)(va_arg(ap, int));
@@ -28,15 +31,21 @@ void	conversionchar(const char *str, va_list ap, t_result *r, t_format *f)
 	else if (str[0] == 's')
 	{
 		//printf("coucou\n");
-		if (f->precision > -1 && f->flag == 's')
-			f->ifwidth = 0;
+		/*if (f->precision > 0 && f->flag == 's')
+			f->ifwidth = 0;*/
 		s = va_arg(ap, char *);
-		r->lentotal += ft_strlen(s);
+		//printf("ifwidth = %d et width = %d\n", f->ifwidth, f->width);
 		if (f->ifwidth == 1)
+		{
+			//printf("coucou\n");
 			s = handling_field(s, f);
-		if (f->flagpoint == 1)
+		}
+		if (f->flagpoint == 1 && f->precision == 0)
+			s = NULL;
+		else if (f->flagpoint == 1)
 			s = s_withpoint(s, f);
-		ft_putstr_fd(s, 1);
+		r->lentotal += ft_strlen(s);
+		write(1, s, ft_strlen(s));
 	}
 	else
 		r->error = 1;
@@ -51,13 +60,15 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 	i = 0;
 	j = 0;
 	k = 0;
+	//printf("str : %s et i = %d\n", str, i);
+
 	while (ischar(str[i], ".cspdiouxX%") == 0)
 		i++;
 	if (i > 0)
 	{
 		f->ifwidth = 1;
 		f->width = strchiffres(str, i);
-		//printf("f->ifwidth = %d\n", f->ifwidth);
+		//printf("ifwidth = %d et f->width = %d\n", f->ifwidth, f->width);
 	}
 	//printf("str : %s et i = %d\n", str, i);
 
@@ -87,11 +98,14 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 	//printf("f->precision = %d\n, i = %d et str : %s\n", f->precision, i, str);
 	if (f->precision < 0)
 		f->precision = 1;
+	//printf("str : %s et i = %d\n", str, i);
 
 	if (ischar(str[i], "cs") == 1)
 	{
-		conversionchar(str, ap, r, f);
 		f->flag = str[i];
+		//printf("ifwidth = %d et f->width = %d\n", f->ifwidth, f->width);
+		conversionchar(&str[i], ap, r, f);
+		//printf("flag = %c et str[i] = %c\n", f->flag, str[i]);
 	}
 	else if (ischar(str[i], "pdiouxX") == 1)
 	{
@@ -140,12 +154,6 @@ void	checkflags(const char *str, va_list ap, t_result *r, t_format *f)
 			i++;
 		}
 	}
-	//printf("1rstzero = %d point: %d precision : %d\n", f->flagzero, f->flagpoint, f->precision);
-	/*if (f->flagzero == 1 && (f->flagminus == 1 || (f->flagpoint == 1
-				&& f->precision > -1) || f->width < 0))
-			f->flagzero = 0;*/
-		//printf("&str[i] : %s\n", &str[i]);
-	//printf("1rstzero = %d\n", f->flagzero);
 	direction(&str[i], ap, r, f);
 }
 
