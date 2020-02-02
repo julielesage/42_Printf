@@ -6,73 +6,13 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:34:31 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/02 01:28:53 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/02 18:05:39 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ft_printf.h"
 #include <stdio.h>
 
-char		*handling_field(char *result, t_format *f)
-{
-	char	*str;
-	int		i;
-	int		swap;
-	//gerer la precision apres la virgule avant le champs
-//	result = //precisefunction
-	i = 0;
-	str = NULL;
-	swap = f->width;
-	if (f->width < 0)
-		swap = -swap;//dprintf(1, "coucou\n");
-	//printf( "result : %s\n", result);
-	//printf("swap ; %d\n", swap);
-	if ((result && swap <= ((int)strlen(result))))
-	{
-		//printf("width qui sert a rien, result garde son malloc\n");
-		return (result);
-	}
-	else
-	{
-		if (f->flagzero == 1 && result[0] == '-')
-		{
-			//printf("coucou\n");
-			str = large_precision_minus(result, f->width, f);
-		}
-		else if(f->flagminus == 1 || (f->flagminus == 0 && f->width < 0))
-		{
-			str = ft_strdupiminus(result, f->width);
-			//printf("coucou\n");
-		}
-		else
-			str = ft_strdupiplus(result, f);
-		//printf("si width > strlen, free result et malloc str apres width :  %s\n", str);
-	}
-	return (str);
-}
-
-/*char		*widthprecision(char *result, t_format *f)
-{
-	char	*new_str;
-	char	*width;
-	int		i;
-
-	new_str = NULL;
-	width = NULL;
-	i = 0;
-	printf("precision : %s\n", f->precision);
-	if (result && f)
-	{
-		while (ischar(f->precisi[i], "0123456789") == 1)
-			i++;
-		width = ft_strndup(f->precisi, i);//malloc de width
-	}
-	i = ft_atoi(width);
-	printf("width : %d\n", i);// 1
-	new_str = handling_field(result, f, i);//faire un malloc pour newstr du nombre i + 1
-	//modifier le field avec 0 - . et * 
-	return (new_str);
-}*/
 
 char		*modify_pointer(char *result)
 {
@@ -121,16 +61,19 @@ void		conversion_digit(const char *str, va_list ap, t_result *r,
 		result = modify_pointer(result);
 	//printf("result apres conversion : %s\n", result);
 	//printf("flagpoint : %d\n", f->flagpoint);
+	//printf("precision : %d\n", f->precision);
 	if (f->flagpoint == 1 )
 		result = withpoint(result, f);
-	//printf("result = %s\n", result);
+	//printf("result = %s la d'une strlen de %zu\n", result, f->precision, (int)ft_strlen(result));
 	//printf("f->ifwidth = %d\n", f->ifwidth);
-	if (f->ifwidth == 1 && f->precision < 1)
+	if (f->width == 0 && !result)
+		result = NULL;
+	else if (f->ifwidth == 1)
 	{
 		//printf("coucou\n");
 		result = handling_field(result, f);
 	}
-	//printf("result : %s\n", result);
+	//printf("result : %s la apres width = %d dune strlen de %zu\n", result, f->width, ft_strlen(result));
 	if (result)
 	{
 		ft_putstr_fd(result, 1);

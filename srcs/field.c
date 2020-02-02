@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/17 22:39:57 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/02 00:50:27 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/02 18:05:36 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -35,8 +35,8 @@ char *withpoint(char *result, t_format *f)
 	char	*hopprecis;
 
 	hopprecis = NULL;
-	//printf("precision = %d\n", f->precision);
-	//printf("result = %s\n", result);
+	//printf("precision = %d\n", f->precision);//0
+	//printf("result = %s\n", result);//0
 	if (f->precision < 1  && (result[0] == '0' && result[1] == '\0'))
 		return (hopprecis);
 	else if ((f->precision < 1 && f->flagpoint == 1)
@@ -56,7 +56,8 @@ char	*ft_strdupiplus(char *result, t_format *f)
 	char	*copy;
 	int		len;
 
-	i = (int)ft_strlen(result) - 1; //0
+	if (result)
+		i = (int)ft_strlen(result) - 1; //0
 	len = f->width;
 	if (len < 0)
 		len = -len;
@@ -73,6 +74,7 @@ char	*ft_strdupiplus(char *result, t_format *f)
 	}
 	while (len-- >= 0)
 	{
+		//printf("coucou, zero = %d\n", f->flagzero);
 		if (f->flagzero == 1)
 			copy[len] = '0';
 		else
@@ -138,6 +140,49 @@ int		strchiffres(const char *str, int len)
 	free (width);
 	//printf("free widthstr\n");
 	return (result);
+}
+
+char		*handling_field(char *result, t_format *f)
+{
+	char	*str;
+	int		i;
+	int		swap;
+
+	i = 0;
+	str = NULL;
+	swap = f->width;
+	if (f->width < 0)
+		swap = -swap;//dprintf(1, "coucou\n");
+	//printf( "result : %s\n", result);
+	//printf("swap ; %d\n", swap);
+	if ((result && swap <= ((int)strlen(result))))
+	{
+		//printf("width qui sert a rien, result garde son malloc\n");
+		return (result);
+	}
+	else
+	{
+		//printf("ZERO = %D\n", f->flagzero);
+		if (result && f->flagzero == 1 && result[0] == '-')
+		{
+			//printf("coucouzero\n");
+			str = large_precision_minus(result, f->width, f);
+		}
+		else if(f->flagminus == 1 || (f->flagminus == 0 && f->width < 0))
+		{
+			str = ft_strdupiminus(result, f->width);
+			//printf("coucouminus\n");
+		}
+
+		else
+		{
+			//printf("coucouplus\n");
+			str = ft_strdupiplus(result, f);
+		}
+		//printf("coucourien\n");
+		//printf("si width > strlen, free result et malloc str apres width :  %s\n", str);
+	}
+	return (str);
 }
 
 /*Si la spécification de la largeur est un astérisque (*), un argument int issu de la liste d’arguments fournit la valeur. L’argument width doit précéder la valeur mise en forme dans la liste des arguments, comme illustré dans l’exemple suivant :

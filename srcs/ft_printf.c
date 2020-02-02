@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:42:44 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/02 01:28:33 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/02 18:04:57 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,8 +18,7 @@ void	conversionchar(const char *str, va_list ap, t_result *r, t_format *f)
 	char	c;
 	char	*s;
 
-// parce que va-arg est une macro qui est remplacee a la compilation
-// donc elle n a pas d adresse au prealable, alors que c oui
+
 	if (str[0] == 'c')
 	{
 		c = (char)(va_arg(ap, int));
@@ -28,13 +27,14 @@ void	conversionchar(const char *str, va_list ap, t_result *r, t_format *f)
 	}
 	else if (str[0] == 's')
 	{
+		//printf("coucou\n");
 		if (f->precision > -1 && f->flag == 's')
 			f->ifwidth = 0;
 		s = va_arg(ap, char *);
 		r->lentotal += ft_strlen(s);
 		if (f->ifwidth == 1)
 			s = handling_field(s, f);
-		if (f->precision > -1)
+		if (f->flagpoint == 1)
 			s = s_withpoint(s, f);
 		ft_putstr_fd(s, 1);
 	}
@@ -67,10 +67,8 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 		if (str[i] == '*') 
 		{
 			f->precision = va_arg(ap, int);
-			if (f->precision < 0)
-				f->precision = 1;
 			i++;
-			//printf("precision *  = %d\n", f->width);
+			//printf("precision *  = %d\n", f->precision);
 		}
 		else if (ischar(str[i], "0123456789") == 1)
 		{
@@ -83,7 +81,13 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 			f->precision = strchiffres(&str[k], j);
 		}
 	}
+	if (f->flagzero == 1 && (f->flagminus == 1 || (f->flagpoint == 1
+				&& f->precision > -1) || f->width < 0))
+		f->flagzero = 0;
 	//printf("f->precision = %d\n, i = %d et str : %s\n", f->precision, i, str);
+	if (f->precision < 0)
+		f->precision = 1;
+
 	if (ischar(str[i], "cs") == 1)
 	{
 		conversionchar(str, ap, r, f);
@@ -136,12 +140,15 @@ void	checkflags(const char *str, va_list ap, t_result *r, t_format *f)
 			i++;
 		}
 	}
-	if (f->flagzero == 1 && (f->flagminus == 1 || f->flagpoint == 1
-		|| f->width < 0))
-		f->flagzero = 0;
-	//printf("&str[i] : %s\n", &str[i]);
+	//printf("1rstzero = %d point: %d precision : %d\n", f->flagzero, f->flagpoint, f->precision);
+	/*if (f->flagzero == 1 && (f->flagminus == 1 || (f->flagpoint == 1
+				&& f->precision > -1) || f->width < 0))
+			f->flagzero = 0;*/
+		//printf("&str[i] : %s\n", &str[i]);
+	//printf("1rstzero = %d\n", f->flagzero);
 	direction(&str[i], ap, r, f);
 }
+
 
 
 void	readstring(const char *str, t_result *r, va_list ap)
@@ -158,7 +165,7 @@ void	readstring(const char *str, t_result *r, va_list ap)
 			j = 1;
 			ft_bzero(&f, sizeof(t_format));
 			//f.width = -1;
-			f.precision = -1;
+			//f.precision = -1;
 			while (ischar(str[i + j], "cspdiouxX%") == 0)
 				j++;
 			checkflags(&str[i + 1], ap, r, &f);
