@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:42:44 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/01 15:42:29 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/02 01:28:33 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,9 +28,11 @@ void	conversionchar(const char *str, va_list ap, t_result *r, t_format *f)
 	}
 	else if (str[0] == 's')
 	{
+		if (f->precision > -1 && f->flag == 's')
+			f->ifwidth = 0;
 		s = va_arg(ap, char *);
 		r->lentotal += ft_strlen(s);
-		if (f->width > -1)
+		if (f->ifwidth == 1)
 			s = handling_field(s, f);
 		if (f->precision > -1)
 			s = s_withpoint(s, f);
@@ -53,8 +55,9 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 		i++;
 	if (i > 0)
 	{
+		f->ifwidth = 1;
 		f->width = strchiffres(str, i);
-		//printf("f->width = %d\n", f->width);
+		//printf("f->ifwidth = %d\n", f->ifwidth);
 	}
 	//printf("str : %s et i = %d\n", str, i);
 
@@ -62,10 +65,14 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 	{
 		i++;
 		if (str[i] == '*') 
-			f->precision = -3;// c est chaud
-		else if (ischar(str[i], "0123456789") == 0)
-			f->precision = -1;
-		else
+		{
+			f->precision = va_arg(ap, int);
+			if (f->precision < 0)
+				f->precision = 1;
+			i++;
+			//printf("precision *  = %d\n", f->width);
+		}
+		else if (ischar(str[i], "0123456789") == 1)
 		{
 			while (ischar(str[i], "0123456789") == 1)
 			{
@@ -76,8 +83,6 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 			f->precision = strchiffres(&str[k], j);
 		}
 	}
-	if (f->precision > -1)
-		f->width = -1;
 	//printf("f->precision = %d\n, i = %d et str : %s\n", f->precision, i, str);
 	if (ischar(str[i], "cs") == 1)
 	{
@@ -94,6 +99,7 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 		write(1, "%", 1);
 	else
 		r->error = 1;
+
 }
 
 void	checkflags(const char *str, va_list ap, t_result *r, t_format *f)
@@ -122,12 +128,16 @@ void	checkflags(const char *str, va_list ap, t_result *r, t_format *f)
 			else if (str[i] == '0')
 				f->flagzero = 1;
 			else if (str[i] == '*')
-				f->flagstar = 1;
+			{
+				f->width = va_arg(ap, int);
+				//printf("width = %d\n", f->width);
+				f->ifwidth = 1;
+			}
 			i++;
 		}
-	//	i--;
 	}
-	if (f->flagzero == 1 && (f->flagminus == 1 || f->flagpoint == 1))
+	if (f->flagzero == 1 && (f->flagminus == 1 || f->flagpoint == 1
+		|| f->width < 0))
 		f->flagzero = 0;
 	//printf("&str[i] : %s\n", &str[i]);
 	direction(&str[i], ap, r, f);
@@ -147,7 +157,7 @@ void	readstring(const char *str, t_result *r, va_list ap)
 		{
 			j = 1;
 			ft_bzero(&f, sizeof(t_format));
-			f.width = -1;
+			//f.width = -1;
 			f.precision = -1;
 			while (ischar(str[i + j], "cspdiouxX%") == 0)
 				j++;

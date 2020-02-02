@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/17 22:39:57 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/01 17:48:10 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/02 00:50:27 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,6 +42,8 @@ char *withpoint(char *result, t_format *f)
 	else if ((f->precision < 1 && f->flagpoint == 1)
 				|| (f->precision < (int)ft_strlen(result)))
 		return (result);
+	else if (result[0] == '-')
+		hopprecis = large_precision_minus(result, f->precision, f);
 	else
 		hopprecis = large_precision(result, f);
 	free (result);
@@ -56,6 +58,8 @@ char	*ft_strdupiplus(char *result, t_format *f)
 
 	i = (int)ft_strlen(result) - 1; //0
 	len = f->width;
+	if (len < 0)
+		len = -len;
 	copy = (char *)malloc(sizeof(char) * len + 1);//3
 	if (copy == NULL)
 		return (NULL);
@@ -66,35 +70,47 @@ char	*ft_strdupiplus(char *result, t_format *f)
 		copy[len - 1] = result[i];
 		len--;
 		i--;
-		//printf(" i = %d et len = %d\n", i, len);
 	}
 	while (len-- >= 0)
 	{
 		if (f->flagzero == 1)
 			copy[len] = '0';
-		else copy[len] = ' ';
-		//printf(" i = %d et len = %d\n", i, len);
+		else
+			copy[len] = ' ';
 	}
 	free (result);
 	return (copy);
 }
 
-char	*ft_strdupiminus(char *result, size_t len)
+char	*ft_strdupiminus(char *result, int len)
 {
-	size_t		i;
 	char		*copy;
 	int			j;
+	int			i;
 
 	i = 0;
-	j = strlen(result);//5
+	if (len < 0)
+		len = -len;
+	j = 0;
+	/*if (result)
+		j = (int)strlen(result);*/
 	copy = (char *)malloc(sizeof(char) * len + 1);
 	if (copy == NULL)
 		return (NULL);
 	copy[len] = '\0';
-	while (j-- && result[j] && len--)
-		copy[len] = result[j];
-	while (len-- && len > 0)
-		copy[len] = ' ';
+
+	while (result && result[i])
+	{
+		copy[i] = result[i];
+		i++;
+	}
+	//printf("coucou\n");
+	//printf("j = %d et len = %d\n", j, len);	len++;
+	while (i < len)
+	{
+		copy[i] = ' ';
+		i++;
+	}
 	free (result);
 	//printf("free result de l itoa\n");
 	return (copy);

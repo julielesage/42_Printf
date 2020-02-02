@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:34:31 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/01 17:47:40 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/02 01:28:53 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -17,27 +17,33 @@ char		*handling_field(char *result, t_format *f)
 {
 	char	*str;
 	int		i;
-	int		lenresult;
+	int		swap;
 	//gerer la precision apres la virgule avant le champs
 //	result = //precisefunction
 	i = 0;
 	str = NULL;
-	lenresult = 0;
-	//dprintf(1, "coucou\n");
+	swap = f->width;
+	if (f->width < 0)
+		swap = -swap;//dprintf(1, "coucou\n");
 	//printf( "result : %s\n", result);
-	if (result != NULL)
-		lenresult = (int)strlen(result);
-	//printf("lenresult %d\n", lenresult);
-	//printf("width: %d\n", f->width);
-	if ((f->width == -1) || (result && f->width <= ((int)strlen(result))))
+	//printf("swap ; %d\n", swap);
+	if ((result && swap <= ((int)strlen(result))))
 	{
 		//printf("width qui sert a rien, result garde son malloc\n");
 		return (result);
 	}
 	else
 	{
-		if (f->flagminus == 1)
+		if (f->flagzero == 1 && result[0] == '-')
+		{
+			//printf("coucou\n");
+			str = large_precision_minus(result, f->width, f);
+		}
+		else if(f->flagminus == 1 || (f->flagminus == 0 && f->width < 0))
+		{
 			str = ft_strdupiminus(result, f->width);
+			//printf("coucou\n");
+		}
 		else
 			str = ft_strdupiplus(result, f);
 		//printf("si width > strlen, free result et malloc str apres width :  %s\n", str);
@@ -117,11 +123,14 @@ void		conversion_digit(const char *str, va_list ap, t_result *r,
 	//printf("flagpoint : %d\n", f->flagpoint);
 	if (f->flagpoint == 1 )
 		result = withpoint(result, f);
-	printf("result = %s\n", result);
-	if (f->width > 0 && f->precision < 1)
+	//printf("result = %s\n", result);
+	//printf("f->ifwidth = %d\n", f->ifwidth);
+	if (f->ifwidth == 1 && f->precision < 1)
+	{
+		//printf("coucou\n");
 		result = handling_field(result, f);
-	
-	printf("result : %s\n", result);
+	}
+	//printf("result : %s\n", result);
 	if (result)
 	{
 		ft_putstr_fd(result, 1);

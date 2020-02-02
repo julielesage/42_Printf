@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2019/12/12 22:36:10 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/02 00:38:33 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/02 00:51:06 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -73,7 +73,7 @@ int			strchiffres(const char *sr, int len);
 char		*withpoint(char *result, t_format *f);
 char		*s_withpoint(char *result, t_format *f);
 char		*large_precision(char *result, t_format *f);
-char		*large_precision_minus(char *result, int buf);
+char		*large_precision_minus(char *result, int buf, t_format *f);
 
 
 #endif
