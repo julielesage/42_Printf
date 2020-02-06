@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:34:31 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/02 18:05:39 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/04 22:05:02 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,13 +16,13 @@
 
 char		*modify_pointer(char *result)
 {
-	char	*strtrim;
+	//char	*strtrim;
 	char	*address;
 
-	strtrim = ft_substr(result, 8, 8);
-	address = "0x7ffe";
-	address = ft_strcat(address, strtrim);
-	free (strtrim);
+	//strtrim = ft_substr(result, 8, 8);
+	address = "0x";
+	address = ft_strcat(address, result);
+	//free (strtrim);
 	free (result);
 	return (address);
 }

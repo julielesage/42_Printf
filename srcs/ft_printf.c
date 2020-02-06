@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:42:44 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/02 23:34:18 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/06 23:20:16 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,25 +25,46 @@ void	conversionchar(const char *str, va_list ap, t_result *r, t_format *f)
 	if (str[0] == 'c')
 	{
 		c = (char)(va_arg(ap, int));
-		write(1, &c, 1);
-		r->lentotal++;
+		if (f->ifwidth == 1)
+		{
+			s = malloc(2 * sizeof(char));
+			s[0] = c;
+			s[1] = '\0';
+			s = handling_field(s, f);
+			r->lentotal += ft_strlen(s);
+			write(1, s, ft_strlen(s));
+			free (s);
+		}
+		else
+		{
+			write(1, &c, 1);
+			r->lentotal++;
+		}
 	}
 	else if (str[0] == 's')
 	{
 		//printf("coucou\n");
 		/*if (f->precision > 0 && f->flag == 's')
 			f->ifwidth = 0;*/
+
 		s = va_arg(ap, char *);
+		//printf("s : %s\n", s);
+		if (f->flagpoint == 1 && f->precision == 0)
+		{
+			//printf("coucou null\n");
+			s = NULL;
+		}
+		else if (f->flagpoint == 1)
+		{
+			s = s_withpoint(s, f);
+			//printf("coucou precion\n");
+		}
 		//printf("ifwidth = %d et width = %d\n", f->ifwidth, f->width);
 		if (f->ifwidth == 1)
 		{
 			//printf("coucou\n");
 			s = handling_field(s, f);
 		}
-		if (f->flagpoint == 1 && f->precision == 0)
-			s = NULL;
-		else if (f->flagpoint == 1)
-			s = s_withpoint(s, f);
 		r->lentotal += ft_strlen(s);
 		write(1, s, ft_strlen(s));
 	}
@@ -96,8 +117,6 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 				&& f->precision > -1) || f->width < 0))
 		f->flagzero = 0;
 	//printf("f->precision = %d\n, i = %d et str : %s\n", f->precision, i, str);
-	if (f->precision < 0)
-		f->precision = 1;
 	//printf("str : %s et i = %d\n", str, i);
 
 	if (ischar(str[i], "cs") == 1)
@@ -114,10 +133,12 @@ void	direction(const char *str, va_list ap, t_result *r, t_format *f)
 		conversion_digit(&str[i], ap, r, f);
 	}
 	else if (str[i] == '%')
+	{
 		write(1, "%", 1);
+		r->lentotal++;
+	}
 	else
 		r->error = 1;
-
 }
 
 void	checkflags(const char *str, va_list ap, t_result *r, t_format *f)
@@ -168,12 +189,11 @@ void	readstring(const char *str, t_result *r, va_list ap)
 	i = 0;
 	while (str[i] != '\0' && r->error == 0)
 	{
+		//printf("combien : %zu\n", r->lentotal);
 		if (str[i] == '%' && str[i + 1])
 		{
 			j = 1;
 			ft_bzero(&f, sizeof(t_format));
-			//f.width = -1;
-			//f.precision = -1;
 			while (ischar(str[i + j], "cspdiouxX%") == 0)
 				j++;
 			checkflags(&str[i + 1], ap, r, &f);

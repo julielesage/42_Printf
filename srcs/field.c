@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/17 22:39:57 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/02 23:27:37 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/04 21:52:24 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -20,13 +20,13 @@ char *s_withpoint(char *result, t_format *f)
 	hopprecis = NULL;
 	//printf("precision = %d\n", f->precision);
 	//printf("result = %s\n", result);
-	if (f->precision < 1  && (result[0] == '0' && result[1] == '\0'))
+	if (f->precision == 0)
 		return (hopprecis);
-	else if (f->precision < 1 && f->flagpoint == 1)
+	if (f->precision < 0 && f->flagpoint == 1)
 		return (result);
 	else
 		hopprecis = strndup(result, f->precision);
-	free (result);
+	//free (result);
 	return (hopprecis);
 }
 
@@ -37,6 +37,8 @@ char *withpoint(char *result, t_format *f)
 	hopprecis = NULL;
 	//printf("precision = %d\n", f->precision);//0
 	//printf("result = %s\n", result);//0
+	if (f->precision < 0 && f->flag != 's')
+		f->precision = 1;
 	if (f->precision < 1  && (result[0] == '0' && result[1] == '\0'))
 		return (hopprecis);
 	else if ((f->precision < 1 && f->flagpoint == 1)
@@ -46,7 +48,8 @@ char *withpoint(char *result, t_format *f)
 		hopprecis = large_precision_minus(result, f->precision, f);
 	else
 		hopprecis = large_precision(result, f);
-	free (result);
+	if (f->flag != 's')
+		free (result);
 	return (hopprecis);
 }
 
@@ -86,7 +89,7 @@ char	*ft_strdupiplus(char *result, t_format *f)
 	return (copy);
 }
 
-char	*ft_strdupiminus(char *result, int len)
+char	*ft_strdupiminus(char *result, int len, t_format *f)
 {
 	char		*copy;
 	int			j;
@@ -115,7 +118,8 @@ char	*ft_strdupiminus(char *result, int len)
 		copy[i] = ' ';
 		i++;
 	}
-	free (result);
+	if (f->flag != 's')
+		free (result);
 	//printf("free result de l itoa\n");
 	return (copy);
 }
@@ -172,7 +176,7 @@ char		*handling_field(char *result, t_format *f)
 		}
 		else if(f->flagminus == 1 || (f->flagminus == 0 && f->width < 0))
 		{
-			str = ft_strdupiminus(result, f->width);
+			str = ft_strdupiminus(result, f->width, f);
 			//printf("coucouminus\n");
 		}
 
