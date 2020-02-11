@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/17 22:39:57 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/04 21:52:24 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/11 18:03:23 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,7 +25,7 @@ char *s_withpoint(char *result, t_format *f)
 	if (f->precision < 0 && f->flagpoint == 1)
 		return (result);
 	else
-		hopprecis = strndup(result, f->precision);
+		hopprecis = ft_strndup(result, f->precision);
 	//free (result);
 	return (hopprecis);
 }
@@ -64,17 +64,20 @@ char	*ft_strdupiplus(char *result, t_format *f)
 	len = f->width;
 	if (len < 0)
 		len = -len;
+	if (f->flag == 'c' && result[0] == '\0')
+		len--;
 	copy = (char *)malloc(sizeof(char) * len + 1);//3
 	if (copy == NULL)
 		return (NULL);
 	//printf(" i = %d et len = %d\n", i, len);
 	copy[len] = '\0';
+	//printf("%c\n", f->flag);
 	while (result && i > -1)
-	{
-		copy[len - 1] = result[i];
-		len--;
-		i--;
-	}
+		{
+			copy[len - 1] = result[i];
+			len--;
+			i--;
+		}
 	while (len-- >= 0)
 	{
 		//printf("coucou, zero = %d\n", f->flagzero);
@@ -105,7 +108,6 @@ char	*ft_strdupiminus(char *result, int len, t_format *f)
 	if (copy == NULL)
 		return (NULL);
 	copy[len] = '\0';
-
 	while (result && result[i])
 	{
 		copy[i] = result[i];
@@ -113,11 +115,17 @@ char	*ft_strdupiminus(char *result, int len, t_format *f)
 	}
 	//printf("coucou\n");
 	//printf("j = %d et len = %d\n", j, len);	len++;
+	if (f->flag == 'c' && result[0] == '\0')
+	{
+		copy[i] = 0;
+		i++;
+	}
 	while (i < len)
 	{
 		copy[i] = ' ';
 		i++;
 	}
+	//printf("%s fait %d caractere\n", copy, strlen(copy));
 	if (f->flag != 's')
 		free (result);
 	//printf("free result de l itoa\n");
@@ -174,7 +182,7 @@ char		*handling_field(char *result, t_format *f)
 			//printf("coucouzero\n");
 			str = large_precision_minus(result, f->width, f);
 		}
-		else if(f->flagminus == 1 || (f->flagminus == 0 && f->width < 0))
+		else if (f->flagminus == 1 /*&& f->width > -1)*/ || (f->flagminus == 0 && f->width < 0))
 		{
 			str = ft_strdupiminus(result, f->width, f);
 			//printf("coucouminus\n");

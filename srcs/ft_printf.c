@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:42:44 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/06 23:20:16 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/11 16:40:21 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,14 +25,19 @@ void	conversionchar(const char *str, va_list ap, t_result *r, t_format *f)
 	if (str[0] == 'c')
 	{
 		c = (char)(va_arg(ap, int));
-		if (f->ifwidth == 1)
+		if (f->ifwidth == 1 && !(c == 0 && (f->width == 0)))
 		{
 			s = malloc(2 * sizeof(char));
 			s[0] = c;
 			s[1] = '\0';
 			s = handling_field(s, f);
-			r->lentotal += ft_strlen(s);
-			write(1, s, ft_strlen(s));
+			if (f->width < 0)
+				f->width = -f->width;
+			if (c == 0)
+				write(1, s, f->width);
+			else
+				write(1, s, ft_strlen(s));
+			r->lentotal += f->width;
 			free (s);
 		}
 		else
