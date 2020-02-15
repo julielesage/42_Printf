@@ -6,7 +6,7 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/02 17:42:44 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/11 16:40:21 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/15 17:32:16 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -54,6 +54,8 @@ void	conversionchar(const char *str, va_list ap, t_result *r, t_format *f)
 
 		s = va_arg(ap, char *);
 		//printf("s : %s\n", s);
+		if (s == NULL)
+			s = ft_strdup("(null)");
 		if (f->flagpoint == 1 && f->precision == 0)
 		{
 			//printf("coucou null\n");
