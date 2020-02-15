@@ -1,37 +1,29 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcat.c                                        :+:      :+:    :+:   */
+/*   ft_memchr.c                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/01/14 22:11:55 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/15 17:56:54 by jlesage          ###   ########.fr       */
+/*   Created: 2019/11/05 11:04:05 by jlesage           #+#    #+#             */
+/*   Updated: 2020/01/27 23:01:54 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ft_printf.h"
 
-char	*ft_strcat(char *dest, char *src)
+void	*ft_memchr(void *src, int c)
 {
-	int		i;
-	int		j;
-	char	*new_dest;
+	size_t			i;
+	unsigned char	*s;
 
 	i = 0;
-	j = 0;
-	if (!(new_dest = (char *)malloc(17 * sizeof(char))))
-		return (NULL);
-	while (dest[i])
+	s = (unsigned char *)src;
+	while (s[i])
 	{
-		new_dest[i] = dest[i];
+		if (s[i] == (unsigned char)c)
+			return (&s[i + 1]);
 		i++;
 	}
-	while (src[j])
-	{
-		new_dest[i + j] = src[j];
-		j++;
-	}
-	new_dest[i + j] = '\0';
-	return (new_dest);
+	return (0);
 }

@@ -1,37 +1,33 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_strcat.c                                        :+:      :+:    :+:   */
+/*   ft_strrchr.c                                       :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/01/14 22:11:55 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/15 17:56:54 by jlesage          ###   ########.fr       */
+/*   Created: 2019/11/05 21:17:39 by jlesage           #+#    #+#             */
+/*   Updated: 2020/01/27 21:46:03 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ft_printf.h"
 
-char	*ft_strcat(char *dest, char *src)
+char	*ft_strrchr(const char *str, int c)
 {
 	int		i;
-	int		j;
-	char	*new_dest;
+	char	*d;
+	int		swap;
 
-	i = 0;
-	j = 0;
-	if (!(new_dest = (char *)malloc(17 * sizeof(char))))
-		return (NULL);
-	while (dest[i])
+	i = ft_strlen(str);
+	swap = i;
+	d = (char *)str;
+	while (i > -1)
 	{
-		new_dest[i] = dest[i];
-		i++;
+		if (str[i] == c)
+			return (&d[i]);
+		i--;
 	}
-	while (src[j])
-	{
-		new_dest[i + j] = src[j];
-		j++;
-	}
-	new_dest[i + j] = '\0';
-	return (new_dest);
+	if (c == '\0')
+		return (&d[swap]);
+	return (NULL);
 }
