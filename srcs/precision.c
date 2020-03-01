@@ -6,67 +6,101 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/02/01 15:42:59 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/02 17:30:05 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/02/18 23:04:41 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ft_printf.h"
-#include <stdio.h>
 
-char	*large_precision(char *result, t_format *f)
+char	*minussuite(char *result, char *copy, int len, t_for *f)
 {
-	char	*copy;
-	int		len;
+	int i;
 
-	len = (int)ft_strlen(result) -1;
-	if (!(copy = (char *)malloc((f->precision + 1) * sizeof(char))))
-		return (NULL);
-	copy[f->precision] = '\0';
-	f->precision--;
-	while (len >= 0)
+	i = 0;
+	copy[len] = '\0';
+	while (result && result[i])
 	{
-		copy[f->precision] = result[len];
-		f->precision--;
-		len--;
+		copy[i] = result[i];
+		i++;
 	}
-	while (f->precision > -1)
+	if (f->flag == 'c' && result[0] == '\0')
 	{
-		copy[f->precision] = '0';
-		f->precision--;
+		copy[i] = 0;
+		i++;
+	}
+	while (i < len)
+	{
+		copy[i] = ' ';
+		i++;
 	}
 	return (copy);
 }
 
-char	*large_precision_minus(char *result, int buf, t_format *f)
+char	*s_withpoint(char *result, t_for *f)
 {
-	char	*copy;
-	int		len;
+	char	*hopprecis;
 
-	//printf("result : %s\n", result);
-	len = (int)ft_strlen(result) -1;
-	if (buf == f->width && f->flagzero == 1)
-		buf--;
-	if (!(copy = (char *)malloc((buf + 2) * sizeof(char))))
-		return (NULL);
-	copy[buf + 1] = '\0';
-	copy[0] = '-';
+	hopprecis = NULL;
+	if (f->precision == 0)
+		return (hopprecis);
+	if (f->precision < 0 && f->flagpoint == 1)
+		return (result);
+	else
+		hopprecis = ft_strndup(result, f->precision);
+	return (hopprecis);
+}
 
-	while (len > 0)
+char	*plussuite(char *result, char *copy, t_for *f, int len)
+{
+	int i;
+
+	if (result)
+		i = (int)ft_strlen(result) - 1;
+	copy[len] = '\0';
+	while (result && i > -1)
 	{
-		copy[buf] = result[len];
-		//printf("result len = %d : %c et copy[buf = %d = %c\n", len, result[len], buf, copy[buf]);
-		buf--;
+		copy[len - 1] = result[i];
 		len--;
+		i--;
 	}
-	//printf("buf ; %d len : %d et copy[2] = %c\n", buf, len, copy, copy[2]);
-	//printf("&copy[2] : %s\n", &copy[2]);
-	while (buf > 0)
+	while (len-- >= 0)
 	{
-		copy[buf] = '0';
-		//printf("&copy[0] : %s mais copy : %s\n", &copy[0], copy);
-
-		buf--;
+		if (f->flagzero == 1)
+			copy[len] = '0';
+		else
+			copy[len] = ' ';
 	}
 	return (copy);
 }
 
+char	*ft_strdupiplus(char *result, t_for *f)
+{
+	char	*copy;
+	int		len;
+
+	len = f->width;
+	if (len < 0)
+		len = -len;
+	if (f->flag == 'c' && result[0] == '\0')
+		len--;
+	copy = (char *)malloc(sizeof(char) * len + 1);
+	if (copy == NULL)
+		return (NULL);
+	copy = plussuite(result, copy, f, len);
+	return (copy);
+}
+
+char	*ft_strdupiminus(char *result, int len, t_for *f)
+{
+	char		*copy;
+	int			i;
+
+	i = 0;
+	if (len < 0)
+		len = -len;
+	copy = (char *)malloc(sizeof(char) * len + 1);
+	if (copy == NULL)
+		return (NULL);
+	copy = minussuite(result, copy, len, f);
+	return (copy);
+}

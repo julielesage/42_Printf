@@ -6,20 +6,19 @@
 /*   By: jlesage <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2020/01/12 17:02:04 by jlesage           #+#    #+#             */
-/*   Updated: 2020/02/15 18:02:24 by jlesage          ###   ########.fr       */
+/*   Updated: 2020/03/01 19:19:11 by jlesage          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "../include/ft_printf.h"
-#include <stdio.h>
 
-static	int		ft_nb(unsigned int n, int f)
+static	int		ft_nb(unsigned long n, int basenb)
 {
 	int				count;
-	unsigned int	base;
+	unsigned long	base;
 
 	count = 0;
-	base = (unsigned int)f;
+	base = (unsigned long)basenb;
 	if (n >= base)
 	{
 		n = n / base;
@@ -29,7 +28,7 @@ static	int		ft_nb(unsigned int n, int f)
 	return (count);
 }
 
-char			*ft_itoa_base(int value, t_format *f)
+char			*ft_itoa_base(int value, t_for *f)
 {
 	char	*str;
 	size_t	buf_size;
@@ -57,21 +56,45 @@ char			*ft_itoa_base(int value, t_format *f)
 	return (str);
 }
 
-char			*ft_itoa_base_u(unsigned int value, t_format *f)
+char			*ft_itoa_base_u(unsigned int value, t_for *f)
 {
-	char	*str;
-	size_t	buf_size;
+	char				*str;
+	size_t				buf_size;
+	unsigned long		tmp;
 
 	buf_size = 0;
-	buf_size = ft_nb(value, f->basenb);
+	tmp = (unsigned long)value;
+	buf_size = ft_nb(tmp, f->basenb);
 	str = (char *)malloc(sizeof(char) * buf_size + 1);
 	str[buf_size] = '\0';
 	if (value == 0)
 		str[0] = '0';
 	while (buf_size && value > 0)
 	{
-		str[buf_size - 1] = f->basestr[value % f->basenb];
-		value = value / f->basenb;
+		str[buf_size - 1] = f->basestr[tmp % f->basenb];
+		tmp = tmp / f->basenb;
+		buf_size--;
+	}
+	return (str);
+}
+
+char			*ft_itoa_base_p(unsigned long value, t_for *f)
+{
+	char				*str;
+	size_t				buf_size;
+	unsigned long long	tmp;
+
+	buf_size = 0;
+	tmp = (unsigned long long)value;
+	buf_size = ft_nb(tmp, f->basenb);
+	str = (char *)malloc(sizeof(char) * buf_size + 1);
+	str[buf_size] = '\0';
+	if (value == 0)
+		str[0] = '0';
+	while (buf_size && value > 0)
+	{
+		str[buf_size - 1] = f->basestr[tmp % f->basenb];
+		tmp = tmp / f->basenb;
 		buf_size--;
 	}
 	return (str);
